@@ -1,0 +1,23 @@
+{
+    "name": "swala/server",
+    "description": "Swoole & Laravel",
+    "type": "laravel-library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "ChieveiT",
+            "email": "javachieveit@163.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "ext-swoole": ">=1.7.7",
+        "laravel/framework": "5.1.*",
+        "composer/installers": "~1.0"
+    },
+    "extra": {
+        "installer-paths": {
+            "{$name}/": ["swala/server"]
+        }
+    }
+}
