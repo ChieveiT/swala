@@ -35,13 +35,13 @@ class Server
     public function onServerStart($serv)
     {
         //服务器启动后记录主进程与manager进程的PID，用于写shutdown脚本
-        file_put_contents(__DIR__ . '/instances/' . $serv->master_pid, "master={$serv->master_pid}\nmanager={$serv->manager_pid}");
+        file_put_contents(__DIR__ . '/instance/' . $serv->master_pid, "master={$serv->master_pid}\nmanager={$serv->manager_pid}");
     }
     
     public function onServerShutdown($serv)
     {
         //删除记录有服务器PID的文件
-        unlink(__DIR__ . '/instances/' . $serv->master_pid);
+        unlink(__DIR__ . '/instance/' . $serv->master_pid);
     }
     
     public function onWorkerStart($serv, $worker_id)
