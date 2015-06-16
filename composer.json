@@ -20,7 +20,7 @@
             "dev-master": "1.0.x-dev"
         },
         "installer-paths": {
-            "{$name}/": ["swala/server"]
+            "{$name}/": ["type:laravel-library"]
         }
     }
 }

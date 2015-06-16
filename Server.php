@@ -9,16 +9,16 @@ class Server
     private $laravel_kernel;
 
     //创建swoole http服务器
-    function __construct($host, $port)
+    function __construct($host, $port, $setting)
     {       
         $this->swoole_http_server = new swoole_http_server($host, $port);
-    }
-    
-    public function start($setting)
-    {
+        
         //swoole配置项
         $this->swoole_http_server->set($setting);
+    }
     
+    public function start()
+    {
         //注册start回调
         $this->swoole_http_server->on('start', array($this, 'onServerStart'));
         //注册shutdown回调
