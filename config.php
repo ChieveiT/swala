@@ -13,6 +13,6 @@ return array(
     'max_request' => 2000,
     'dispatch_mode' => 1,
     
-    'log_file' => __DIR__ . '/log/server_log',
+    'log_file' => __DIR__ . '/log/log',
     'daemonize' => 1
 );
