@@ -13,7 +13,7 @@ $serv->set($setting);
 //全局计数器
 $count = 0;
 
-//测试worker是否能常驻对象资源
+//测试worker能否被抢占
 $serv->on('request', function($request, $response){
     global $count;
     $count++;
