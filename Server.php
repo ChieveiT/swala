@@ -35,7 +35,10 @@ class Server
     public function onServerStart($serv)
     {
         //服务器启动后记录主进程与manager进程的PID，用于写shutdown脚本
-        file_put_contents(__DIR__ . '/instance/' . $serv->master_pid, "master={$serv->master_pid}\nmanager={$serv->manager_pid}");
+        file_put_contents(
+            __DIR__ . '/instance/' . $serv->master_pid, 
+            "master={$serv->master_pid}\nmanager={$serv->manager_pid}"
+        );
     }
     
     public function onServerShutdown($serv)
@@ -46,7 +49,8 @@ class Server
     
     public function onWorkerStart($serv, $worker_id)
     {
-        //创建laravel内核（把该逻辑放在此处，确保所有worker创建前父进程副本与laravel无关，令laravel具备热部署特性）
+        //创建laravel内核（把该逻辑放在此处，确保所有worker创建前父进程副本与laravel
+        //无关，令laravel具备热部署特性）
         require __DIR__ . '/../bootstrap/autoload.php';
         $app = require __DIR__.'/../bootstrap/app.php';
         $this->laravel_kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
@@ -57,7 +61,8 @@ class Server
     
     public function onRequest($request, $response)
     {
-        //[备注]由于laravel_kernel接受illuminate_request并返回illuminate_response，所以该方法针对swoole的请求和响应进行兼容处理
+        //[备注]由于laravel_kernel接受illuminate_request并返回illuminate_response，所
+        //      以该方法针对swoole的请求和响应进行兼容处理
     
         //兼容Swoole的请求对象
         $get = isset($request->get) ? $request->get : array();
@@ -65,6 +70,15 @@ class Server
         $cookie = isset($request->cookie) ? $request->cookie : array();
         $server = isset($request->server) ? $request->server : array();
         
+        //issue #2 laravel结合swoole每次刷新session都会变的问题 by cong8341
+        //注：由于swoole对cookie中的特殊字符（=等）做了urlencode，导致laravel的encrypter
+        //    在下次请求时接受到的payload与上一个请求响应时发出的不一致，最终导致每次请求
+        //    都解出不一样的laravel_session
+        foreach($cookie as $key => $value) {
+            $cookie[$key] = urldecode($value);
+        }
+        
+        //在swoole环境下$_SERVER的所有key都为小写，需要把它们转化为大写
         foreach ($server as $key => $value) {
             $server[strtoupper($key)] = $value;
             unset($server[$key]);
@@ -89,7 +103,15 @@ class Server
         }
         // cookies
         foreach ($illuminate_response->headers->getCookies() as $cookie) {
-            $response->cookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
+            $response->cookie(
+                $cookie->getName(), 
+                $cookie->getValue(), 
+                $cookie->getExpiresTime(), 
+                $cookie->getPath(), 
+                $cookie->getDomain(), 
+                $cookie->isSecure(), 
+                $cookie->isHttpOnly()
+            );
         }
         // content
         $content = $illuminate_response->getContent();
