@@ -14,10 +14,5 @@
         "ext-swoole": ">=1.7.7",
         "laravel/framework": "5.1.*",
         "swala/installer": "~1.0"
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0-dev"
-        }
     }
 }
