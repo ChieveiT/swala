@@ -78,8 +78,10 @@ class Server
         // swoole中header并没有包含于$request->server中，需要合并
         foreach($header as $key => $value) {
             $header['http_'.$key] = $value;
-            unset($server[$key]);
+            unset($header[$key]);
         }
+        $server = array_merge($server, $header);
+        
         //issue #2 laravel结合swoole每次刷新session都会变的问题 by cong8341
         //注：由于swoole对cookie中的特殊字符（=等）做了urlencode，导致laravel的encrypter
         //    在下次请求时接受到的payload与上一个请求响应时发出的不一致，最终导致每次请求
