@@ -70,14 +70,6 @@ class Server
         $cookie = isset($request->cookie) ? $request->cookie : array();
         $server = isset($request->server) ? $request->server : array();
         
-        //issue #2 laravel结合swoole每次刷新session都会变的问题 by cong8341
-        //注：由于swoole对cookie中的特殊字符（=等）做了urlencode，导致laravel的encrypter
-        //    在下次请求时接受到的payload与上一个请求响应时发出的不一致，最终导致每次请求
-        //    都解出不一样的laravel_session
-        foreach($cookie as $key => $value) {
-            $cookie[$key] = urldecode($value);
-        }
-        
         //在swoole环境下$_SERVER的所有key都为小写，需要把它们转化为大写
         foreach ($server as $key => $value) {
             $server[strtoupper($key)] = $value;
