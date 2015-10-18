@@ -69,6 +69,18 @@ class Server
         $post = isset($request->post) ? $request->post : array();
         $cookie = isset($request->cookie) ? $request->cookie : array();
         $server = isset($request->server) ? $request->server : array();
+        $header = isset($request->header) ? $request->header : array();
+        
+        // 对于Content-Type为非application/x-www-form-urlencoded的请求体需要给SymfonyRequest传入原始的Body
+        $content = $request->rawContent();
+        $content = empty($content) ? null : $content;
+        
+        // swoole中header并没有包含于$request->server中，需要合并
+        foreach($header as $key => $value) {
+            $header['http_'.$key] = $value;
+            unset($header[$key]);
+        }
+        $server = array_merge($server, $header);
         
         //issue #2 laravel结合swoole每次刷新session都会变的问题 by cong8341
         //注：由于swoole对cookie中的特殊字符（=等）做了urlencode，导致laravel的encrypter
@@ -86,7 +98,7 @@ class Server
     
         //创建illuminate_request
         $illuminate_request = IlluminateRequest::createFromBase(
-            new SymfonyRequest($get, $post, array(), $cookie, array()/*$_FILES*/, $server)
+            new SymfonyRequest($get, $post, array(), $cookie, array()/*$_FILES*/, $server, $content)
         );
         
         //把illuminate_request传入laravel_kernel后，取回illuminate_response
